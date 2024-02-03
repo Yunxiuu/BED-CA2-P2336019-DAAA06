@@ -1,52 +1,34 @@
-const comments = [
-    {
-        name: "Danny",
-        comment:
-            "Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
-        time: "Thu Jan 12 2022",
-    },
-    {
-        name: "Jackson",
-        comment: "Lorem Ipsum dolor sit amet, consectetur adipiscing elit",
-        time: "Thu Jan 11 2022",
-    },
-];
+document.addEventListener("DOMContentLoaded", function () {
+    const signupForm = document.getElementById("messageForm");
+    const warningCard = document.getElementById("warningCard");
+    const warningText = document.getElementById("warningText");
 
-const commentsBox = document.querySelector("#comments");
-let nameInput = document.querySelector("#name");
-let commentInput = document.querySelector("#comment");
-const btnSubmit = document.querySelector("#btn-submit");
-const btnClose = document.querySelector(".btn-close");
+    signupForm.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-const rennderComments = function (comments) {
-    commentsBox.innerHTML = ""
-    comments.forEach((item) => {
-        commentsBox.insertAdjacentHTML(
-            'beforeend',
-            `<hr />
-          <h4>
-              <span>${item.name}</span>
-              <span class="date">${item.time}</span>
-          </h4>
-          <p>${item.comment}</p>
-          `
-        )
+        const message = document.getElementById("message").value;
 
-    }
-    )
-}
+        const callback = (responseStatus, responseData) => {
+            console.log("responseStatus:", responseStatus);
+            console.log("responseData:", responseData);
+            if (responseStatus == 200) {
+                // Check if signup was successful
+                if (responseData.token) {
+                    // Store the token in local storage
+                    localStorage.setItem("token", responseData.token);
+                    // Redirect or perform further actions for logged-in user
+                    window.location.href = "message.html";
+                }
+            } else {
+                warningCard.classList.remove("d-none");
+                warningText.innerText = responseData.message;
+            }
+        };
 
+        // Perform signup request
+        fetchMethod(currentUrl + "/api/message", callback, "POST", data);
 
-
-let isClosed = false;
-btnClose.onclick = function () {
-    if (!isClosed) {
-        btnClose.textContent = "开启留言";
-    } else {
-        btnClose.textContent = "关闭留言";
-    }
-    nameInput.disabled = !nameInput.disabled;
-    commentInput.disabled = !commentInput.disabled;
-    btnSubmit.disabled=!btnSubmit.disabled;
-    isClosed = !isClosed;
-}
+        // Reset the form fields
+        messageForm.reset();
+    })
+})
