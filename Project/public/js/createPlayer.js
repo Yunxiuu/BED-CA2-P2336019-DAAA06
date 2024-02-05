@@ -1,38 +1,22 @@
-function getUserId() {
-  // Get the JWT token from local storage
-  const token = localStorage.getItem("token");
-
-  // Check if the token exists
-  if (token) {
-    try {
-      // Decode the JWT token (assuming it's in the format "Bearer <token>")
-      const [, encodedPayload] = token.split(" ");
-      const payload = JSON.parse(atob(encodedPayload));
-
-      // Extract user ID from the payload
-      const userId = payload.userId;
-
-      return userId;
-    } catch (error) {
-      console.error("Error decoding JWT token:", error);
-    }
-  }
-
-  // Return null if token doesn't exist or decoding fails
-  return null;
-}
-
 document.addEventListener("DOMContentLoaded", function () {
   const createPlayerForm = document.getElementById("createPlayerForm");
   const warningCard = document.getElementById("warningCard");
   const warningText = document.getElementById("warningText");
+
+  // Function to get user ID from localStorage (you may need to adjust this based on your authentication mechanism)
+  function getUserId() {
+    const token = localStorage.getItem("token");
+
+    // Assuming your JWT payload has a field 'userId'
+    const decodedToken = jwt_decode(token);
+    return decodedToken.userId;
+  }
 
   createPlayerForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
     const playerName = document.getElementById("playerName").value;
     const userId = getUserId();
-
 
     // Perform player creation logic
     const data = {
@@ -57,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Perform player creation request
-    fetchMethod(currentUrl + "/api/user/${userId}/player", callback, "POST", data);
+    fetchMethod(currentUrl + `/api/user/${userId}/player`, callback, "POST", data);
 
     // Reset the form fields
     createPlayerForm.reset();
